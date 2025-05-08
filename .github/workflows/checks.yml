@@ -1,28 +1,29 @@
 name: Checks
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+on: [push]
 
 jobs:
   test-lint:
-    name: Run Tests and Lint
+    name: Test & Lint
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+     
+      - name: Set up Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
-      - name: Log in to Docker Hub
+      - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Run tests
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Test
         run: docker-compose run --rm app sh -c "python manage.py test"
 
-      - name: Run flake8 linter
+      - name: Lint
         run: docker-compose run --rm app sh -c "flake8"
