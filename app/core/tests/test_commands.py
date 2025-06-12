@@ -11,22 +11,23 @@ from django.test import SimpleTestCase
 class CommandTests(SimpleTestCase):
     """Test commands"""
 
-    @patch('django.db.connections["default"].cursor')
-    def test_wait_for_db_ready(self, patched_cursor):
+    @patch('django.db.connections')
+    def test_wait_for_db_ready(self, patched_connections):
         """Test waiting for database if database ready"""
-        patched_cursor.return_value.__enter__.return_value = True
+        patched_connections.__getitem__.return_value.cursor.return_value.__enter__.return_value = True
 
         call_command('wait_for_db')
 
-        patched_cursor.assert_called_once()
+        patched_connections.__getitem__.assert_called_once_with('default')
 
     @patch('time.sleep')
-    @patch('django.db.connections["default"].cursor')
-    def test_wait_for_db_delay(self, patched_cursor, patched_sleep):
+    @patch('django.db.connections')
+    def test_wait_for_db_delay(self, patched_connections, patched_sleep):
         """Test waiting for database when getting OperationalError"""
-        patched_cursor.side_effect = [Psycopg2Error] * 2 + \
+        patched_connections.__getitem__.return_value.cursor.side_effect = [Psycopg2Error] * 2 + \
             [OperationalError] * 3 + [True]
 
         call_command('wait_for_db')
 
-        self.assertEqual(patched_cursor.call_count, 6)
+        self.assertEqual(patched_connections.__getitem__.call_count, 6)
+        patched_connections.__getitem__.assert_called_with('default')
