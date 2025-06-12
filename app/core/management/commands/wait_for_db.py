@@ -4,6 +4,7 @@ Django Command To Wait For The Database To Be Available
 import time
 from django.db.utils import OperationalError
 from django.core.management.base import BaseCommand
+from django.db import connections
 from psycopg2 import OperationalError as Psycopg2Error
 
 
@@ -16,7 +17,7 @@ class Command(BaseCommand):
 
         while db_up is False:
             try:
-                with self.db.connections['default'].cursor() as cursor:
+                with connections['default'].cursor() as cursor:
                     cursor.execute('SELECT 1')
                 db_up = True
             except (Psycopg2Error, OperationalError):
