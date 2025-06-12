@@ -20,6 +20,7 @@ class Command(BaseCommand):
                 with connections['default'].cursor() as cursor:
                     cursor.execute('SELECT 1')
                 db_up = True
+                
             except (Psycopg2Error, OperationalError):
                 self.stdout.write('Database unavailable, waiting 1 second...')
                 time.sleep(1)
