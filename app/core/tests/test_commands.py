@@ -11,17 +11,19 @@ from django.test import SimpleTestCase
 class CommandTests(SimpleTestCase):
     """Test commands"""
 
-    def test_wait_for_db_ready(self):
+    @patch('django.db.utils.ConnectionHandler.__getitem__')
+    def test_wait_for_db_ready(self, patched_check):
         """Test waiting for database if database ready"""
-        with patch('django.db.utils.ConnectionHandler.__getitem__') as gi:
-            gi.return_value = True
-            call_command('wait_for_db')
-            self.assertEqual(gi.call_count, 1)
+        patched_check.return_value = True
+        call_command('wait_for_db')
+        patched_check.assert_called_once_with('default')
 
-    def test_wait_for_db_delay(self):
+    @patch('time.sleep')
+    @patch('django.db.utils.ConnectionHandler.__getitem__')
+    def test_wait_for_db_delay(self, patched_check, patched_sleep):
         """Test waiting for database when getting OperationalError"""
-        with patch('django.db.utils.ConnectionHandler.__getitem__') as gi:
-            gi.side_effect = [Psycopg2Error] * 2 + \
-                [OperationalError] * 3 + [True]
-            call_command('wait_for_db')
-            self.assertEqual(gi.call_count, 6)
+        patched_check.side_effect = [Psycopg2Error] * 2 + \
+            [OperationalError] * 3 + [True]
+        call_command('wait_for_db')
+        self.assertEqual(patched_check.call_count, 6)
+        patched_check.assert_called_with('default')
