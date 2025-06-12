@@ -8,7 +8,7 @@ from psycopg2 import OperationalError as Psycopg2Error
 
 
 class Command(BaseCommand):
-    """ Django Command to wait for database """
+    """Django Command to wait for database"""
 
     def handle(self, *args, **options):
         self.stdout.write('Waiting for database...')
