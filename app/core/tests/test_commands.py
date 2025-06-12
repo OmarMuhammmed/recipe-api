@@ -7,11 +7,11 @@ from psycopg2 import OperationalError as Psycopg2OpError
 
 from django.core.management import call_command
 from django.db.utils import OperationalError
-from django.test import SimpleTestCase
+from django.test import TestCase  # Changed from SimpleTestCase
 
 
 @patch('core.management.commands.wait_for_db.Command.check')
-class CommandTests(SimpleTestCase):
+class CommandTests(TestCase):  # Changed from SimpleTestCase
     """Test commands."""
 
     def test_wait_for_db_ready(self, patched_check):
