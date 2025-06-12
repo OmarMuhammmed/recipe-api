@@ -63,3 +63,4 @@ class CommandTests(TestCase):
         self.assertEqual(mock_connection.cursor.call_count, 6)
         # Verify sleep was called 5 times (for each failure)
         self.assertEqual(patched_sleep.call_count, 5)
+        
