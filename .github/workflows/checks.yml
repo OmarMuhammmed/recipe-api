@@ -22,6 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Wait for DB to be ready
+        run: docker-compose run --rm app sh -c "python manage.py wait_for_db"
+
       - name: Run migrations
         run: docker-compose run --rm app sh -c "python manage.py migrate"
 
